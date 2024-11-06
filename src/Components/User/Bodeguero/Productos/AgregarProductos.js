@@ -8,6 +8,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { db } from '../../../../libs/firebase'; // Importar Firestore
 import { collection, addDoc } from 'firebase/firestore'; // Métodos de Firestore
+import { Input } from "../../../ui/Input"; // Importar el componente Input
 
 export default function AgregarProducto() {
   const [formData, setFormData] = useState({
@@ -154,7 +155,7 @@ export default function AgregarProducto() {
             {/* Campo SKU (ingresado manualmente) */}
             <div className="mb-4">
               <label htmlFor="sku" className="block text-sm font-medium text-gray-700">SKU</label>
-              <input
+              <Input
                 id="sku"
                 name="sku"
                 type="text"
@@ -167,7 +168,7 @@ export default function AgregarProducto() {
             {/* Nombre del Producto */}
             <div className="mb-4">
               <label htmlFor="nombreProducto" className="block text-sm font-medium text-gray-700">Nombre del Producto</label>
-              <input
+              <Input
                 id="nombreProducto"
                 name="nombreProducto"
                 type="text"
@@ -180,7 +181,7 @@ export default function AgregarProducto() {
             {/* Marca */}
             <div className="mb-4">
               <label htmlFor="marca" className="block text-sm font-medium text-gray-700">Marca</label>
-              <input
+              <Input
                 id="marca"
                 name="marca"
                 type="text"
@@ -193,7 +194,7 @@ export default function AgregarProducto() {
             {/* Rack (rellenado por el QR) */}
             <div className="mb-4">
               <label htmlFor="rack" className="block text-sm font-medium text-gray-700">Código del Rack (desde el QR)</label>
-              <input
+              <Input
                 id="rack"
                 name="rack"
                 type="text"

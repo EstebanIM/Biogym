@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx"; // Si necesitas manejar variantes más adelante
+import clsx from "clsx"; // Para manejar las variantes y clases condicionales
 
 export const Card = ({ className, variant = "default", children }) => {
   const variantStyles = clsx({
@@ -8,22 +8,24 @@ export const Card = ({ className, variant = "default", children }) => {
   });
 
   return (
-    <div className={clsx("rounded-lg overflow-hidden shadow-lg", variantStyles, className)}>
+    <div className={clsx("rounded-lg overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105", variantStyles, className)}>
       {children}
     </div>
   );
 };
 
 export const CardHeader = ({ className, children }) => (
-  <div className={clsx("p-4 bg-gray-800", className)}>{children}</div>
+  <div className={clsx("p-4 flex flex-col items-center", className)}>
+    {children}
+  </div>
 );
 
 export const CardContent = ({ className, children }) => (
-  <div className={clsx("p-4", className)}>{children}</div>
+  <div className={clsx("p-4 text-center", className)}>{children}</div>
 );
 
 export const CardTitle = ({ className, children }) => (
-  <h2 className={clsx("text-lg font-bold", className)}>{children}</h2>
+  <h2 className={clsx("text-lg font-bold text-white", className)}>{children}</h2>
 );
 
 export const CardDescription = ({ className, children }) => (

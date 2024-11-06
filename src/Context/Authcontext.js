@@ -1,13 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth } from '../libs/firebase';
-import { 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
-  signOut, 
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
   createUserWithEmailAndPassword,
-  sendPasswordResetEmail 
+  sendPasswordResetEmail
 } from 'firebase/auth';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../libs/firebase'; // Importa la configuración de Firestore
 import Swal from 'sweetalert2';
 
@@ -66,7 +66,6 @@ export const AuthProvider = ({ children }) => {
       await signInWithEmailAndPassword(auth, email, password);
       Swal.fire('Éxito', 'Inicio de sesión exitoso', 'success');
     } catch (error) {
-      // Devolver el error para que el componente llamador lo maneje
       switch (error.code) {
         case 'auth/user-not-found':
           throw new Error('El correo electrónico no está registrado');
@@ -85,7 +84,17 @@ export const AuthProvider = ({ children }) => {
   // Función para registrarse
   const register = async (email, password) => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      // Crear el usuario en Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Guardar los datos del usuario en Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
+        createdAt: serverTimestamp(), // Marca de tiempo de la creación
+        isVerified: false // Campo adicional para la verificación del usuario
+      });
+
       Swal.fire('Éxito', 'Registro exitoso', 'success');
     } catch (error) {
       switch (error.code) {

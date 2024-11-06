@@ -1,34 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { doc, setDoc, getDocs, collection } from 'firebase/firestore';
-import { db } from '../../../libs/firebase'; // Your Firestore config
-import DashboardHeader from "../../menu/DashboardHeader"; // Your dashboard header component
-import DashboardSidebar from "../../menu/DashboardSidebar"; // Your dashboard sidebar component
-import { Input } from "../../ui/Input"; // Custom Input component
-import { Button } from "../../ui/button"; // Custom Button component
+import { db } from '../../../libs/firebase';
+import DashboardHeader from "../../menu/DashboardHeader";
+import DashboardSidebar from "../../menu/DashboardSidebar";
+import { Input } from "../../ui/Input";
+import { Button } from "../../ui/button";
 import { toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css'; // Import toastify CSS
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function AdminCreateUser() {
-  const [sidebarOpen, setSidebarOpen] = useState(false); // State to manage sidebar
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('');
-  const [name, setName] = useState(''); // New state for the user's name
-  const [store, setStore] = useState(''); // New state for store selection
-  const [stores, setStores] = useState([]); // List of available stores from Firestore
+  const [name, setName] = useState('');
+  const [store, setStore] = useState('');
+  const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen); // Toggle the sidebar
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  // Fetch stores from Firestore
   useEffect(() => {
     const fetchStores = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "tiendas")); // Fetching from "tiendas" collection
+        const querySnapshot = await getDocs(collection(db, "tiendas"));
         const storesList = querySnapshot.docs.map(doc => ({
           id: doc.id,
-          nombreTienda: doc.data().nombreTienda, // Using "nombreTienda" field
+          nombreTienda: doc.data().nombreTienda,
         }));
         setStores(storesList);
       } catch (error) {
@@ -40,37 +39,32 @@ export default function AdminCreateUser() {
     fetchStores();
   }, []);
 
-  // Function to handle creating a new user
   const handleCreateUser = async (e) => {
     e.preventDefault();
     setLoading(true);
     const auth = getAuth();
 
     try {
-      // Create user in Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Send email verification
       await sendEmailVerification(user);
       toast.success(`Email de verificación enviado a ${email}`);
 
-      // Save the user data in Firestore with their role, name, and associated store
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
-        name: name, // Save the user's name
-        role: role, // Assigning the role (logística, bodeguero, vendedor)
-        store: store, // Saving the associated store
+        name: name,
+        role: role,
+        store: store,
         createdAt: new Date(),
       });
 
       toast.success(`Usuario creado con éxito. Nombre: ${name}, Rol: ${role}, Tienda: ${store}`);
 
-      // Reset form
       setEmail('');
       setPassword('');
       setRole('');
-      setName(''); // Reset the name
+      setName('');
       setStore('');
     } catch (error) {
       console.error('Error creando usuario:', error);
@@ -82,62 +76,57 @@ export default function AdminCreateUser() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 md:flex-row">
-      {/* Sidebar */}
       <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
         <DashboardHeader toggleSidebar={toggleSidebar} />
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4">
-          <div className="max-w-lg mx-auto p-4 bg-white shadow-md rounded-lg">
-            <h1 className="text-2xl font-bold mb-4">Crear Nuevo Usuario</h1>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+          <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg">
+            <h1 className="text-3xl font-semibold mb-6 text-center text-gray-800">Crear Nuevo Usuario</h1>
 
             <form onSubmit={handleCreateUser}>
-              {/* Input for Name */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Nombre del usuario</label>
+              <div className="mb-5">
+                <label className="block text-sm font-semibold text-gray-700">Nombre del usuario</label>
                 <Input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ingresa el nombre completo"
                   required
+                  className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
                 />
               </div>
 
-              {/* Input for Email */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Email del usuario</label>
+              <div className="mb-5">
+                <label className="block text-sm font-semibold text-gray-700">Email del usuario</label>
                 <Input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Ingresa el email"
                   required
+                  className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
                 />
               </div>
 
-              {/* Input for Password */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+              <div className="mb-5">
+                <label className="block text-sm font-semibold text-gray-700">Contraseña</label>
                 <Input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Ingresa la contraseña"
                   required
+                  className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
                 />
               </div>
 
-              {/* Select Role */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Rol del usuario</label>
+              <div className="mb-5">
+                <label className="block text-sm font-semibold text-gray-700">Rol del usuario</label>
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  className="mt-2 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   required
                 >
                   <option value="">Seleccionar un rol</option>
@@ -147,26 +136,28 @@ export default function AdminCreateUser() {
                 </select>
               </div>
 
-              {/* Select Store */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Tienda Asociada</label>
+              <div className="mb-5">
+                <label className="block text-sm font-semibold text-gray-700">Tienda Asociada</label>
                 <select
                   value={store}
                   onChange={(e) => setStore(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  className="mt-2 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   required
                 >
                   <option value="">Seleccionar una tienda</option>
                   {stores.map((store) => (
                     <option key={store.id} value={store.id}>
-                      {store.nombreTienda} {/* Now using "nombreTienda" */}
+                      {store.nombreTienda}
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* Submit Button */}
-              <Button type="submit" className="bg-blue-500 text-white p-2 rounded-md w-full" disabled={loading}>
+              <Button 
+                type="submit" 
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold p-3 rounded-lg w-full"
+                disabled={loading}
+              >
                 {loading ? 'Creando Usuario...' : 'Crear Usuario'}
               </Button>
             </form>

@@ -62,13 +62,13 @@ export default function LoginForm() {
               {/* Input para el email */}
               <div>
                 <Label htmlFor="email">Correo electrónico</Label>
-                <Input 
-                  id="email" 
-                  placeholder="tu@email.com" 
-                  type="email" 
-                  required 
-                  className="mt-1" 
-                  value={email} 
+                <Input
+                  id="email"
+                  placeholder="tu@email.com"
+                  type="email"
+                  required
+                  className="mt-1"
+                  value={email}
                   onChange={(e) => setEmail(e.target.value)} // Maneja el cambio de email
                 />
               </div>
@@ -81,7 +81,7 @@ export default function LoginForm() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     required
-                    value={password} 
+                    value={password}
                     onChange={(e) => setPassword(e.target.value)} // Maneja el cambio de contraseña
                   />
                   <Button
@@ -104,8 +104,8 @@ export default function LoginForm() {
               {error && <p className="text-red-500 text-sm">{error}</p>}
 
               {/* Botón para enviar el formulario */}
-              <Button 
-                className="w-full bg-yellow-500 hover:bg-yellow-600" 
+              <Button
+                className="w-full bg-yellow-500 hover:bg-yellow-600"
                 type="submit"
                 disabled={loading} // Deshabilitar el botón si está en estado de carga
               >
@@ -118,8 +118,9 @@ export default function LoginForm() {
           <div className="mt-4 text-center text-sm text-gray-300">
             <Link to="/reset-password" className="text-yellow-500 hover:underline">
               ¿Olvidaste tu contraseña?
-            </Link> 
+            </Link>
           </div>
+
         </CardContent>
       </Card>
     </div>

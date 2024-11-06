@@ -3,6 +3,7 @@ import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "../../../libs/firebase"; // Importamos Firestore
 import DashboardHeader from "../../menu/DashboardHeader";
 import DashboardSidebar from "../../menu/DashboardSidebar";
+import { ResponsiveTable } from "../../ui/ResponsiveTable"; // Importa el componente ResponsiveTable
 import { toast } from "react-toastify"; // Importar el toast
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -88,6 +89,21 @@ export default function VerBodegas() {
     return productos.filter(producto => rackIds.includes(producto.rack));
   };
 
+  // Configuración de los encabezados y las filas para ResponsiveTable
+  const headers = ["Nombre de Bodega", "Tienda Asociada", "Cantidad de Productos", "Cantidad de Racks"];
+  const rows = filteredBodegas.map((bodega) => {
+    const tienda = tiendas.find((tienda) => tienda.id === bodega.idTienda);
+    const productosCount = getProductosForBodega(bodega.codBodega).length;
+    const racksCount = racks.filter((rack) => rack.codBodega === bodega.codBodega).length;
+
+    return [
+      bodega.nomBodega,
+      tienda ? tienda.nombreTienda : "Tienda no encontrada",
+      productosCount > 0 ? productosCount : "No hay productos registrados",
+      racksCount > 0 ? racksCount : "No hay racks registrados",
+    ];
+  });
+
   return (
     <div className="flex flex-col h-screen bg-gray-100 md:flex-row">
       {/* Sidebar */}
@@ -99,11 +115,11 @@ export default function VerBodegas() {
 
         {/* Contenido Principal - Mostrar Bodegas */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4">
-          <div className="max-w-lg mx-auto p-4 bg-white shadow-md rounded-lg">
-            <h1 className="text-2xl font-bold mb-6">Bodegas</h1>
+          <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-6">
+            <h1 className="text-3xl font-semibold text-center mb-6 text-gray-800">Bodegas</h1>
 
             {loading ? (
-              <p>Cargando bodegas...</p>
+              <p className="text-center text-gray-500">Cargando bodegas...</p>
             ) : (
               <div>
                 {/* Filtros */}
@@ -123,31 +139,8 @@ export default function VerBodegas() {
                   </select>
                 </div>
 
-                {/* Listado de bodegas filtradas */}
-                <ul>
-                  {filteredBodegas.map((bodega) => (
-                    <li key={bodega.id} className="mb-4">
-                      <div className="bg-white shadow p-4 rounded-lg">
-                        <h2 className="font-bold text-lg">{bodega.nomBodega}</h2>
-                        <p className="text-gray-600">Tienda: {tiendas.find((tienda) => tienda.id === bodega.idTienda)?.nombreTienda || "Tienda no encontrada"}</p>
-
-                        {/* Mostrar productos de la bodega */}
-                        <p className="text-gray-600">
-                          {getProductosForBodega(bodega.codBodega).length > 0
-                            ? `Cantidad de productos: ${getProductosForBodega(bodega.codBodega).length}`
-                            : "No hay productos registrados"}
-                        </p>
-
-                        {/* Mostrar racks de la bodega */}
-                        <p className="text-gray-600">
-                          {racks.filter(rack => rack.codBodega === bodega.codBodega).length > 0
-                            ? `Cantidad de racks: ${racks.filter(rack => rack.codBodega === bodega.codBodega).length}`
-                            : "No hay racks registrados"}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                {/* Tabla de bodegas filtradas */}
+                <ResponsiveTable headers={headers} rows={rows} />
               </div>
             )}
           </div>

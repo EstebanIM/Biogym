@@ -8,15 +8,15 @@ export const ResponsiveTable = ({ headers, rows }) => {
         <thead>
           <tr className="bg-gray-200 text-gray-700 uppercase text-xs leading-normal">
             {headers.map((header, index) => (
-              <th key={index} className="py-3 px-6">{header}</th>
+              <th key={index} className="py-3 px-6 text-left font-semibold">{header}</th>
             ))}
           </tr>
         </thead>
-        <tbody className="text-gray-600 text-sm">
+        <tbody className="text-gray-700 text-sm">
           {rows.map((row, rowIndex) => (
-            <tr key={rowIndex} className="border-b border-gray-200 hover:bg-gray-100">
+            <tr key={rowIndex} className="border-b border-gray-200 hover:bg-gray-50">
               {row.map((cell, cellIndex) => (
-                <td key={cellIndex} className="py-3 px-6">{cell}</td>
+                <td key={cellIndex} className="py-3 px-6 text-left">{cell}</td>
               ))}
             </tr>
           ))}
