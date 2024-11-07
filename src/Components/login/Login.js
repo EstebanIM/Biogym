@@ -6,7 +6,7 @@ import { Label } from "../ui/Label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/Card";
 import { useAuth } from '../../Context/Authcontext'; // Importa el contexto de autenticación
 import { Link, useNavigate } from 'react-router-dom'; // useNavigate para la redirección
-import { toast } from 'react-toastify'; // Para notificaciones
+// import { toast } from 'react-toastify'; // Para notificaciones
 import 'react-toastify/dist/ReactToastify.css'; // Estilos de Toastify
 
 export default function LoginForm() {
@@ -29,7 +29,7 @@ export default function LoginForm() {
 
     try {
       await login(email, password); // Inicia sesión con el email y la contraseña
-      navigate("/dashboard"); // Redirigir al Dashboard tras inicio de sesión exitoso
+      navigate("/inicio"); // Redirigir al inicio tras inicio de sesión exitoso
     } catch (error) {
       // Manejar diferentes errores de Firebase
       if (error.code === 'auth/wrong-password') {
@@ -46,7 +46,7 @@ export default function LoginForm() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900 py-6 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md bg-black text-white shadow-xl rounded-lg">
+      <Card className="w-full max-w-md bg-black text-black shadow-xl rounded-lg">
         <CardHeader className="space-y-1 text-center">
           <div className="flex items-center justify-center mb-4">
             <ShoppingBag className="h-12 w-12 text-yellow-500" />
@@ -64,7 +64,7 @@ export default function LoginForm() {
                 <Label htmlFor="email">Correo electrónico</Label>
                 <Input
                   id="email"
-                  placeholder="tu@email.com"
+                  placeholder="Tucorreo@email.com"
                   type="email"
                   required
                   className="mt-1"
@@ -79,6 +79,7 @@ export default function LoginForm() {
                 <div className="relative mt-1">
                   <Input
                     id="password"
+                    placeholder="Clave"
                     type={showPassword ? "text" : "password"}
                     required
                     value={password}

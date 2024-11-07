@@ -1,28 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "../../ui/Input";
 import { Button } from "../../ui/button";
-import { db } from "../../../libs/firebase"; // Importamos Firestore
-import { collection, addDoc, getDocs } from "firebase/firestore"; // Para interactuar con Firestore
-import DashboardHeader from "../../menu/DashboardHeader"; // Importar el header del dashboard
-import DashboardSidebar from "../../menu/DashboardSidebar"; // Importar el sidebar del dashboard
-import { toast } from "react-toastify"; // Importar el toast
-import 'react-toastify/dist/ReactToastify.css'; // Importa el CSS de react-toastify si no lo has hecho
+import { db } from "../../../libs/firebase";
+import { collection, addDoc, getDocs } from "firebase/firestore";
+import DashboardHeader from "../../menu/DashboardHeader";
+import DashboardSidebar from "../../menu/DashboardSidebar";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CrearBodega() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [formData, setFormData] = useState({
-    codBodega: "", // Código automático para la bodega
+    codBodega: "",
     nomBodega: "",
     idTienda: "",
-    nombreTienda: "", // Añadimos el nombre de la tienda
+    nombreTienda: "",
   });
   const [loading, setLoading] = useState(false);
-  const [tiendas, setTiendas] = useState([]); // Lista de tiendas para seleccionar
-  const [loadingTiendas, setLoadingTiendas] = useState(true); // Estado para manejar la carga de tiendas
+  const [tiendas, setTiendas] = useState([]);
+  const [loadingTiendas, setLoadingTiendas] = useState(true);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  // Cargar tiendas desde Firestore para la relación
   useEffect(() => {
     const fetchTiendas = async () => {
       try {
@@ -42,10 +41,9 @@ export default function CrearBodega() {
     fetchTiendas();
   }, []);
 
-  // Generar un código de bodega único automáticamente
   useEffect(() => {
     const generateCodBodega = () => {
-      const codBodega = `BOD-${Date.now()}`; // Generar un código único basado en la fecha actual
+      const codBodega = `BOD-${Date.now()}`;
       setFormData((prevData) => ({
         ...prevData,
         codBodega,
@@ -53,9 +51,8 @@ export default function CrearBodega() {
     };
 
     generateCodBodega();
-  }, []); // Se ejecuta solo una vez para generar el código al montar el componente
+  }, []);
 
-  // Manejador general para actualizar los campos del formulario
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData({
@@ -64,18 +61,16 @@ export default function CrearBodega() {
     });
   };
 
-  // Función para manejar el cambio de selección de tienda
   const handleTiendaChange = (e) => {
     const selectedTiendaId = e.target.value;
     const selectedTienda = tiendas.find((tienda) => tienda.id === selectedTiendaId);
     setFormData({
       ...formData,
-      idTienda: selectedTiendaId, // Guardamos el id de la tienda
-      nombreTienda: selectedTienda ? selectedTienda.nombreTienda : "", // Guardamos el nombre de la tienda
+      idTienda: selectedTiendaId,
+      nombreTienda: selectedTienda ? selectedTienda.nombreTienda : "",
     });
   };
 
-  // Validación del formulario
   const validateForm = () => {
     const { nomBodega, idTienda } = formData;
     if (!nomBodega.trim()) {
@@ -89,12 +84,10 @@ export default function CrearBodega() {
     return true;
   };
 
-  // Función que maneja el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Validación antes de enviar el formulario
     if (!validateForm()) {
       setLoading(false);
       return;
@@ -103,19 +96,17 @@ export default function CrearBodega() {
     const { codBodega, nomBodega, idTienda, nombreTienda } = formData;
 
     try {
-      // Agregar los datos de la bodega a Firestore
       await addDoc(collection(db, "bodegas"), {
-        codBodega, // Se guarda en la base de datos, pero no se muestra al usuario
+        codBodega,
         nomBodega,
-        idTienda, // Guardamos el id de la tienda para relaciones futuras
-        nombreTienda, // Guardamos el nombre de la tienda para mostrarlo
+        idTienda,
+        nombreTienda,
       });
 
       toast.success("Bodega creada exitosamente");
 
-      // Limpiar el formulario
       setFormData({
-        codBodega: `BOD-${Date.now()}`, // Genera un nuevo código para la próxima bodega
+        codBodega: `BOD-${Date.now()}`,
         nomBodega: "",
         idTienda: "",
         nombreTienda: "",
@@ -130,25 +121,21 @@ export default function CrearBodega() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 md:flex-row">
-      {/* Sidebar */}
       <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
         <DashboardHeader toggleSidebar={toggleSidebar} />
 
-        {/* Contenido Principal - Formulario para Crear Bodega */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4">
-          <div className="max-w-lg mx-auto p-4 bg-white shadow-md rounded-lg">
-            <h1 className="text-2xl font-bold mb-6">Crear Bodega</h1>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+          <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg">
+            <h1 className="text-3xl font-semibold mb-6 text-center text-gray-800">Crear Bodega</h1>
 
             {loadingTiendas ? (
-              <p>Cargando tiendas...</p>
+              <p className="text-center text-gray-500">Cargando tiendas...</p>
             ) : (
               <form onSubmit={handleSubmit}>
-                {/* Nombre de la bodega */}
-                <div className="mb-4">
-                  <label htmlFor="nomBodega" className="block text-sm font-medium text-gray-700">
+                <div className="mb-5">
+                  <label htmlFor="nomBodega" className="block text-sm font-semibold text-gray-700">
                     Nombre de la Bodega
                   </label>
                   <Input
@@ -158,20 +145,19 @@ export default function CrearBodega() {
                     value={formData.nomBodega}
                     onChange={handleInputChange}
                     required
-                    className="mt-1"
+                    className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
                   />
                 </div>
 
-                {/* Selección de la tienda */}
-                <div className="mb-4">
-                  <label htmlFor="idTienda" className="block text-sm font-medium text-gray-700">
+                <div className="mb-5">
+                  <label htmlFor="idTienda" className="block text-sm font-semibold text-gray-700">
                     Seleccionar Tienda
                   </label>
                   <select
                     id="idTienda"
                     value={formData.idTienda}
                     onChange={handleTiendaChange}
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                    className="mt-2 p-2 border border-gray-300 rounded-lg w-full bg-white"
                     required
                   >
                     <option value="">Seleccione una tienda</option>
@@ -183,16 +169,13 @@ export default function CrearBodega() {
                   </select>
                 </div>
 
-                {/* Botón de crear */}
-                <div className="mb-4">
-                  <Button
-                    type="submit"
-                    className="w-full bg-blue-500 text-white"
-                    disabled={loading}
-                  >
-                    {loading ? "Creando bodega..." : "Crear Bodega"}
-                  </Button>
-                </div>
+                <Button
+                  type="submit"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold p-3 rounded-lg w-full"
+                  disabled={loading}
+                >
+                  {loading ? "Creando bodega..." : "Crear Bodega"}
+                </Button>
               </form>
             )}
           </div>
@@ -201,3 +184,4 @@ export default function CrearBodega() {
     </div>
   );
 }
+  

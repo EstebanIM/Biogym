@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Input } from "../../ui/Input";
 import { Button } from "../../ui/button";
-import { db } from "../../../libs/firebase"; // Importamos Firestore
-import { collection, addDoc } from "firebase/firestore"; // Para interactuar con Firestore
-import DashboardHeader from "../../menu/DashboardHeader"; // Importar el header del dashboard
-import DashboardSidebar from "../../menu/DashboardSidebar"; // Importar el sidebar del dashboard
-import chileRegions from '../../../data/comunas-regiones'; // Importar el archivo JSON de regiones
-import { toast } from "react-toastify"; // Importar el toast
-import 'react-toastify/dist/ReactToastify.css'; // Importa el CSS de react-toastify si no lo has hecho
+import { db } from "../../../libs/firebase";
+import { collection, addDoc } from "firebase/firestore";
+import DashboardHeader from "../../menu/DashboardHeader";
+import DashboardSidebar from "../../menu/DashboardSidebar";
+import chileRegions from '../../../data/comunas-regiones';
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CrearTienda() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -22,22 +22,19 @@ export default function CrearTienda() {
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  // Función para manejar el cambio de región y actualizar las ciudades (comunas)
   const handleRegionChange = (e) => {
     const selectedRegion = e.target.value;
     setFormData({
       ...formData,
       region: selectedRegion,
-      ciudad: "", // Limpiar la ciudad seleccionada al cambiar la región
+      ciudad: "",
     });
   };
 
-  // Obtener las comunas de la región seleccionada
   const comunas = formData.region
     ? chileRegions.regiones.find((r) => r.region === formData.region)?.comunas || []
     : [];
 
-  // Manejador general para actualizar los campos del formulario
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData({
@@ -46,11 +43,8 @@ export default function CrearTienda() {
     });
   };
 
-  // Validación del formulario
   const validateForm = () => {
     const { nombreTienda, direccion, numeroDireccion, ciudad, region } = formData;
-
-    // Verificar que los campos no estén vacíos
     if (!nombreTienda.trim()) {
       toast.error("El nombre de la tienda es obligatorio.");
       return false;
@@ -71,16 +65,13 @@ export default function CrearTienda() {
       toast.error("El número de dirección debe ser un número válido.");
       return false;
     }
-
     return true;
   };
 
-  // Función que maneja el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Validación antes de enviar el formulario
     if (!validateForm()) {
       setLoading(false);
       return;
@@ -89,7 +80,6 @@ export default function CrearTienda() {
     const { nombreTienda, direccion, numeroDireccion, ciudad, region } = formData;
 
     try {
-      // Agregar los datos de la tienda a Firestore con un ID automático
       const docRef = await addDoc(collection(db, "tiendas"), {
         nombreTienda,
         direccion: `${direccion} ${numeroDireccion}`,
@@ -98,9 +88,8 @@ export default function CrearTienda() {
         fechaCreacion: new Date(),
       });
 
-      toast.success(`Tienda creada exitosamente con ID: ${docRef.id}`); // Muestra el ID de la tienda creada
+      toast.success(`Tienda creada exitosamente con ID: ${docRef.id}`);
 
-      // Limpiar el formulario
       setFormData({
         nombreTienda: "",
         direccion: "",
@@ -110,7 +99,7 @@ export default function CrearTienda() {
       });
     } catch (err) {
       console.error("Error al agregar tienda a Firestore:", err);
-      toast.error("Error al crear la tienda: " + err.message); // Toast de error
+      toast.error("Error al crear la tienda: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -118,22 +107,18 @@ export default function CrearTienda() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 md:flex-row">
-      {/* Sidebar */}
       <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
         <DashboardHeader toggleSidebar={toggleSidebar} />
 
-        {/* Contenido Principal - Formulario para Crear Tienda */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4">
-          <div className="max-w-lg mx-auto p-4 bg-white shadow-md rounded-lg">
-            <h1 className="text-2xl font-bold mb-6">Crear Tienda</h1>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+          <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg">
+            <h1 className="text-3xl font-semibold mb-6 text-center text-gray-800">Crear Tienda</h1>
             
             <form onSubmit={handleSubmit}>
-              {/* Nombre de la tienda */}
-              <div className="mb-4">
-                <label htmlFor="nombreTienda" className="block text-sm font-medium text-gray-700">
+              <div className="mb-5">
+                <label htmlFor="nombreTienda" className="block text-sm font-semibold text-gray-700">
                   Nombre de la Tienda
                 </label>
                 <Input
@@ -143,20 +128,19 @@ export default function CrearTienda() {
                   value={formData.nombreTienda}
                   onChange={handleInputChange}
                   required
-                  className="mt-1"
+                  className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
                 />
               </div>
 
-              {/* Región */}
-              <div className="mb-4">
-                <label htmlFor="region" className="block text-sm font-medium text-gray-700">
+              <div className="mb-5">
+                <label htmlFor="region" className="block text-sm font-semibold text-gray-700">
                   Región
                 </label>
                 <select
                   id="region"
                   value={formData.region}
                   onChange={handleRegionChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  className="mt-2 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   required
                 >
                   <option value="">Seleccione una región</option>
@@ -168,18 +152,17 @@ export default function CrearTienda() {
                 </select>
               </div>
 
-              {/* Ciudad (Comuna) */}
-              <div className="mb-4">
-                <label htmlFor="ciudad" className="block text-sm font-medium text-gray-700">
+              <div className="mb-5">
+                <label htmlFor="ciudad" className="block text-sm font-semibold text-gray-700">
                   Ciudad
                 </label>
                 <select
                   id="ciudad"
                   value={formData.ciudad}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  className="mt-2 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   required
-                  disabled={!formData.region} // Desactivar si no se ha seleccionado una región
+                  disabled={!formData.region}
                 >
                   <option value="">Seleccione una ciudad</option>
                   {comunas.map((comuna) => (
@@ -190,9 +173,8 @@ export default function CrearTienda() {
                 </select>
               </div>
 
-              {/* Dirección */}
-              <div className="mb-4">
-                <label htmlFor="direccion" className="block text-sm font-medium text-gray-700">
+              <div className="mb-5">
+                <label htmlFor="direccion" className="block text-sm font-semibold text-gray-700">
                   Dirección
                 </label>
                 <Input
@@ -202,13 +184,12 @@ export default function CrearTienda() {
                   value={formData.direccion}
                   onChange={handleInputChange}
                   required
-                  className="mt-1"
+                  className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
                 />
               </div>
 
-              {/* Número de Dirección */}
-              <div className="mb-4">
-                <label htmlFor="numeroDireccion" className="block text-sm font-medium text-gray-700">
+              <div className="mb-5">
+                <label htmlFor="numeroDireccion" className="block text-sm font-semibold text-gray-700">
                   Número de Dirección
                 </label>
                 <Input
@@ -218,20 +199,17 @@ export default function CrearTienda() {
                   value={formData.numeroDireccion}
                   onChange={handleInputChange}
                   required
-                  className="mt-1"
+                  className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
                 />
               </div>
 
-              {/* Botón de crear */}
-              <div className="mb-4">
-                <Button
-                  type="submit"
-                  className="w-full bg-blue-500 text-white"
-                  disabled={loading}
-                >
-                  {loading ? "Creando tienda..." : "Crear Tienda"}
-                </Button>
-              </div>
+              <Button
+                type="submit"
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold p-3 rounded-lg w-full"
+                disabled={loading}
+              >
+                {loading ? "Creando tienda..." : "Crear Tienda"}
+              </Button>
             </form>
           </div>
         </main>

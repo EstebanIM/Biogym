@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../../../libs/firebase';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { ResponsiveTable } from "../../../ui/ResponsiveTable";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

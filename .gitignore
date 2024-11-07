@@ -2,6 +2,9 @@
 
 #firebase
 /src/libs/firebase.js
+ServiceAccountKey.json
+upload.js
+productos.json
 
 # dependencies
 /node_modules

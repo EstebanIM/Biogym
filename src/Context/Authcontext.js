@@ -151,6 +151,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     currentUser,
     userData, // Exponer los datos del usuario para usar en otros componentes
+    role: userData?.role || null, // Acceso directo al rol del usuario
     loading, // Estado de carga expuesto para usar en los componentes
     login,
     logout,

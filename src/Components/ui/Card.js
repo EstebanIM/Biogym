@@ -3,7 +3,7 @@ import clsx from "clsx"; // Para manejar las variantes y clases condicionales
 
 export const Card = ({ className, variant = "default", children }) => {
   const variantStyles = clsx({
-    "bg-gray-800 text-white": variant === "default",
+    "bg-gray-100 text-black": variant === "default",
     "bg-white text-gray-900": variant === "light",
   });
 
@@ -25,9 +25,9 @@ export const CardContent = ({ className, children }) => (
 );
 
 export const CardTitle = ({ className, children }) => (
-  <h2 className={clsx("text-lg font-bold text-white", className)}>{children}</h2>
+  <h2 className={clsx("text-lg font-bold text-black", className)}>{children}</h2>
 );
 
 export const CardDescription = ({ className, children }) => (
-  <p className={clsx("text-sm text-gray-400", className)}>{children}</p>
+  <p className={clsx("text-sm text-gray-700", className)}>{children}</p>
 );

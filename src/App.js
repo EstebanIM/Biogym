@@ -3,12 +3,8 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './Components/login/Login';
 import ResetPasswordForm from './Components/login/resetPassword';
-import Dashboard from './Components/all/dashboard';
 import CrearTienda from './Components/admin/Tienda/CrearTienda';
 import CrearBodega from './Components/admin/Bodega/CrearBodega';
-import { AuthProvider } from './Context/Authcontext';
-import ProtectedRoute from './Context/ProtectedRoute';
-import RedirectIfLoggedIn from './Context/RedirectIfLoggedIn';
 import VerTiendas from './Components/admin/Tienda/Gettiendas';
 import CrearDueño from './Components/duenio/Crear_duenio';
 import VerBodegas from './Components/admin/Bodega/VerBodegas';
@@ -20,9 +16,12 @@ import GetProd from './Components/User/Bodeguero/Productos/VerProductos';
 import CrearUsuario from './Components/admin/users/CrearUser';
 import VerUsuario from './Components/admin/users/VerUser';
 import Verificacion from './Components/login/isverify';
-import Inicio from './Components/all/inicio'; // Importar el componente de inicio
-
-// Importa ToastContainer de react-toastify
+import Inicio from './Components/all/inicio';
+import Config from './Components/all/Config';
+import AccessDenied from './Components/all/AccessDenied'; // Importar AccessDenied
+import { AuthProvider } from './Context/Authcontext';
+import ProtectedRoute from './Context/ProtectedRoute';
+import RedirectIfLoggedIn from './Context/RedirectIfLoggedIn';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -61,18 +60,8 @@ function App() {
           <Route
             path="/inicio"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['logistica', 'vendedor', 'bodeguero']}>
                 <Inicio />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Ruta de General */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
               </ProtectedRoute>
             }
           />
@@ -81,7 +70,7 @@ function App() {
           <Route
             path="/ver-tienda"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['logistica', 'vendedor']}>
                 <VerTiendas />
               </ProtectedRoute>
             }
@@ -89,7 +78,7 @@ function App() {
           <Route
             path="/crear-tienda"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['logistica']}>
                 <CrearTienda />
               </ProtectedRoute>
             }
@@ -99,7 +88,7 @@ function App() {
           <Route
             path="/crear-dueño"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['logistica']}>
                 <CrearDueño />
               </ProtectedRoute>
             }
@@ -109,7 +98,7 @@ function App() {
           <Route
             path="/crear-bodega"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['logistica']}>
                 <CrearBodega />
               </ProtectedRoute>
             }
@@ -117,7 +106,7 @@ function App() {
           <Route
             path="/ver-bodegas"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['logistica', 'bodeguero', 'vendedor']}>
                 <VerBodegas />
               </ProtectedRoute>
             }
@@ -127,7 +116,7 @@ function App() {
           <Route
             path="/crear-rack"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['bodeguero', 'logistica']}>
                 <CrearRack />
               </ProtectedRoute>
             }
@@ -135,7 +124,7 @@ function App() {
           <Route
             path="/QR-Crear"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['bodeguero', 'logistica']}>
                 <QrGene />
               </ProtectedRoute>
             }
@@ -143,8 +132,18 @@ function App() {
           <Route
             path="/Ver-rack"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['bodeguero', 'logistica', 'vendedor']}>
                 <VerRack />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Ruta de Configuración */}
+          <Route
+            path="/config"
+            element={
+              <ProtectedRoute allowedRoles={['logistica', 'bodeguero', 'vendedor']}>
+                <Config />
               </ProtectedRoute>
             }
           />
@@ -153,7 +152,7 @@ function App() {
           <Route
             path="/Agregar-Producto"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['bodeguero', 'logistica']}>
                 <PostProd />
               </ProtectedRoute>
             }
@@ -161,7 +160,7 @@ function App() {
           <Route
             path="/ver-Producto"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['bodeguero', 'vendedor', 'logistica']}>
                 <GetProd />
               </ProtectedRoute>
             }
@@ -171,7 +170,7 @@ function App() {
           <Route
             path="/Crear-users"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['logistica']}>
                 <CrearUsuario />
               </ProtectedRoute>
             }
@@ -179,11 +178,14 @@ function App() {
           <Route
             path="/Ver-users"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['logistica']}>
                 <VerUsuario />
               </ProtectedRoute>
             }
           />
+
+          {/* Ruta de acceso denegado */}
+          <Route path="/access-denied" element={<AccessDenied />} />
         </Routes>
         {/* Añadir ToastContainer en la jerarquía */}
         <ToastContainer />

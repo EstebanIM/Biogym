@@ -3,7 +3,7 @@ import React from 'react';
 
 export const Label = ({ children, ...props }) => (
   <label
-    className="block text-sm font-medium text-white"
+    className="block text-sm font-medium text-black"
     {...props}
   >
     {children}

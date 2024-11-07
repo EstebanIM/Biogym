@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { Package, ChevronUp, ChevronDown, Users, Dumbbell, Box, Store, Bug, X, Home } from "lucide-react"; // Importar icono Home
-import { Link } from 'react-router-dom'; // Importar Link de react-router-dom
+import { Package, ChevronUp, ChevronDown, Users, Dumbbell, Box, Store, X, Home } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../Context/Authcontext'; // Importar el hook de autenticación
 
 export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
   const [isUsersMenuOpen, setIsUsersMenuOpen] = useState(false);
@@ -9,16 +10,21 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
   const [isRackMenuOpen, setIsRackMenuOpen] = useState(false);
   const [isBodegaMenuOpen, setIsBodegaMenuOpen] = useState(false);
   const [isTiendaMenuOpen, setIsTiendaMenuOpen] = useState(false);
-  const [isBugsMenuOpen, setIsBugsMenuOpen] = useState(false);
   const [isDuenosMenuOpen, setIsDuenosMenuOpen] = useState(false);
+
+  const { userData } = useAuth(); // Obtener los datos del usuario, incluyendo el rol
 
   const toggleUsersMenu = () => setIsUsersMenuOpen(!isUsersMenuOpen);
   const toggleInventoryMenu = () => setIsInventoryMenuOpen(!isInventoryMenuOpen);
   const toggleRackMenu = () => setIsRackMenuOpen(!isRackMenuOpen);
   const toggleBodegaMenu = () => setIsBodegaMenuOpen(!isBodegaMenuOpen);
   const toggleTiendaMenu = () => setIsTiendaMenuOpen(!isTiendaMenuOpen);
-  const toggleBugsMenu = () => setIsBugsMenuOpen(!isBugsMenuOpen);
   const toggleDuenosMenu = () => setIsDuenosMenuOpen(!isDuenosMenuOpen);
+
+  // Definir permisos de acceso para cada rol
+  const isLogistica = userData?.role === 'logistica';
+  const isBodeguero = userData?.role === 'bodeguero';
+  const isVendedor = userData?.role === 'vendedor';
 
   return (
     <aside
@@ -37,169 +43,138 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
 
       <nav className="space-y-2 overflow-y-auto">
         {/* Botón de Inicio */}
-        <Link to="/inicio" className="w-full block">
+        <div>
           <Button variant="ghost" className="w-full justify-start flex items-center">
-            <Home className="mr-2 h-4 w-4" /> Inicio
+            <Link to="/inicio" className="w-full flex items-center">
+              <Home className="mr-2 h-4 w-4" />
+              <span>Inicio</span>
+            </Link>
           </Button>
-        </Link>
-
-        {/* Inventario */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center"
-            onClick={toggleInventoryMenu}
-          >
-            <Package className="mr-2 h-4 w-4" /> Inventario
-            {isInventoryMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
-          </Button>
-          {isInventoryMenuOpen && (
-            <div className="pl-6 mt-2 space-y-1">
-              <Link to="/Agregar-Producto" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Crear Producto</Button>
-              </Link>
-
-              <Link to="/ver-Producto" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Ver Productos</Button>
-              </Link>
-              <Button variant="ghost" className="w-full justify-start">Modificar Producto</Button>
-            </div>
-          )}
         </div>
 
+        {/* Inventario - Visible para Bodeguero, Vendedor y Logística */}
+        {(isBodeguero || isVendedor || isLogistica) && (
+          <div>
+            <Button variant="ghost" className="w-full justify-start flex items-center" onClick={toggleInventoryMenu}>
+              <Package className="mr-2 h-4 w-4" /> Inventario
+              {isInventoryMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
+            </Button>
+            {isInventoryMenuOpen && (
+              <div className="pl-6 mt-2 space-y-1">
+                {(userData?.role === 'bodeguero' || userData?.role === 'logistica') && (
+                  <Link to="/Agregar-Producto" className="w-full block">
+                    <Button variant="ghost" className="w-full justify-start">Crear Producto</Button>
+                  </Link>
+                )}
+                <Link to="/ver-Producto" className="w-full block">
+                  <Button variant="ghost" className="w-full justify-start">Ver Productos</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
 
-        {/* Cuentas */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center"
-            onClick={toggleUsersMenu}
-          >
-            <Users className="mr-2 h-4 w-4" /> Cuentas
-            {isUsersMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
-          </Button>
-          {isUsersMenuOpen && (
-            <div className="pl-6 mt-2 space-y-1">
+        {/* Cuentas - Visible solo para Logística */}
+        {isLogistica && (
+          <div>
+            <Button variant="ghost" className="w-full justify-start flex items-center" onClick={toggleUsersMenu}>
+              <Users className="mr-2 h-4 w-4" /> Cuentas
+              {isUsersMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
+            </Button>
+            {isUsersMenuOpen && (
+              <div className="pl-6 mt-2 space-y-1">
+                <Link to="/Crear-users" className="w-full block">
+                  <Button variant="ghost" className="w-full justify-start">Crear Usuario</Button>
+                </Link>
+                <Link to="/Ver-users" className="w-full block">
+                  <Button variant="ghost" className="w-full justify-start">Ver Usuarios</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
 
-              <Link to="/Crear-users" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Crear Usuario</Button>
-              </Link>
-              <Link to="/Ver-users" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Ver Usuarios</Button>
-              </Link>
-              <Button variant="ghost" className="w-full justify-start">Modificar Usuario</Button>
-            </div>
-          )}
-        </div>
-        {/* Racks */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center"
-            onClick={toggleRackMenu}
-          >
-            <Package className="mr-2 h-4 w-4" /> Racks
-            {isRackMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
-          </Button>
-          {isRackMenuOpen && (
-            <div className="pl-6 mt-2 space-y-1">
-              <Link to="/crear-rack" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Crear Rack</Button>
-              </Link>
-              <Link to="/Qr-Crear" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Imprimir QR</Button>
-              </Link>
-              <Link to="/Ver-rack" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Ver Racks</Button>
-              </Link>
-            </div>
-          )}
-        </div>
+        {/* Racks - Visible para Bodeguero y Logística */}
+        {(isBodeguero || isLogistica) && (
+          <div>
+            <Button variant="ghost" className="w-full justify-start flex items-center" onClick={toggleRackMenu}>
+              <Package className="mr-2 h-4 w-4" /> Racks
+              {isRackMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
+            </Button>
+            {isRackMenuOpen && (
+              <div className="pl-6 mt-2 space-y-1">
+                <Link to="/crear-rack" className="w-full block">
+                  <Button variant="ghost" className="w-full justify-start">Crear Rack</Button>
+                </Link>
+                <Link to="/Qr-Crear" className="w-full block">
+                  <Button variant="ghost" className="w-full justify-start">Imprimir QR</Button>
+                </Link>
+                <Link to="/Ver-rack" className="w-full block">
+                  <Button variant="ghost" className="w-full justify-start">Ver Racks</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
 
-        {/* Bodega */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center"
-            onClick={toggleBodegaMenu}
-          >
-            <Box className="mr-2 h-4 w-4" /> Bodega
-            {isBodegaMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
-          </Button>
-          {isBodegaMenuOpen && (
-            <div className="pl-6 mt-2 space-y-1">
-              <Link to="/crear-bodega" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Crear Bodega</Button>
-              </Link>
-              <Link to="/ver-bodegas" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Ver Bodega</Button>
-              </Link>
-              <Button variant="ghost" className="w-full justify-start">Modificar Bodega</Button>
-            </div>
-          )}
-        </div>
+        {/* Bodega - Visible para Logística y Bodeguero */}
+        {(isLogistica || isBodeguero) && (
+          <div>
+            <Button variant="ghost" className="w-full justify-start flex items-center" onClick={toggleBodegaMenu}>
+              <Box className="mr-2 h-4 w-4" /> Bodega
+              {isBodegaMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
+            </Button>
+            {isBodegaMenuOpen && (
+              <div className="pl-6 mt-2 space-y-1">
+                {isLogistica && (
+                  <Link to="/crear-bodega" className="w-full block">
+                    <Button variant="ghost" className="w-full justify-start">Crear Bodega</Button>
+                  </Link>
+                )}
+                <Link to="/ver-bodegas" className="w-full block">
+                  <Button variant="ghost" className="w-full justify-start">Ver Bodega</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
 
-        {/* Tienda */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center"
-            onClick={toggleTiendaMenu}
-          >
-            <Store className="mr-2 h-4 w-4" /> Tienda
-            {isTiendaMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
-          </Button>
-          {isTiendaMenuOpen && (
-            <div className="pl-6 mt-2 space-y-1">
-              <Link to="/crear-tienda" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Crear Tienda</Button>
-              </Link>
-              <Link to="/ver-tienda" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Ver Tienda</Button>
-              </Link>
-              <Button variant="ghost" className="w-full justify-start">Modificar Tienda</Button>
-            </div>
-          )}
-        </div>
+        {/* Tienda - Visible solo para Logística */}
+        {isLogistica && (
+          <div>
+            <Button variant="ghost" className="w-full justify-start flex items-center" onClick={toggleTiendaMenu}>
+              <Store className="mr-2 h-4 w-4" /> Tienda
+              {isTiendaMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
+            </Button>
+            {isTiendaMenuOpen && (
+              <div className="pl-6 mt-2 space-y-1">
+                <Link to="/crear-tienda" className="w-full block">
+                  <Button variant="ghost" className="w-full justify-start">Crear Tienda</Button>
+                </Link>
+                <Link to="/ver-tienda" className="w-full block">
+                  <Button variant="ghost" className="w-full justify-start">Ver Tienda</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
 
-        {/* Bugs */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center"
-            onClick={toggleBugsMenu}
-          >
-            <Bug className="mr-2 h-4 w-4" /> Bugs
-            {isBugsMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
-          </Button>
-          {isBugsMenuOpen && (
-            <div className="pl-6 mt-2 space-y-1">
-              <Button variant="ghost" className="w-full justify-start">Crear Comentario</Button>
-              <Button variant="ghost" className="w-full justify-start">Ver Bugs</Button>
-            </div>
-          )}
-        </div>
-
-        {/* Dueños */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center"
-            onClick={toggleDuenosMenu}
-          >
-            <Users className="mr-2 h-4 w-4" /> Dueños
-            {isDuenosMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
-          </Button>
-          {isDuenosMenuOpen && (
-            <div className="pl-6 mt-2 space-y-1">
-              <Link to="/crear-dueño" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Crear Dueño</Button>
-              </Link>
-              <Button variant="ghost" className="w-full justify-start">Ver Dueños</Button>
-              <Button variant="ghost" className="w-full justify-start">Modificar Dueño</Button>
-            </div>
-          )}
-        </div>
+        {/* Dueños - Visible solo para Logística */}
+        {isLogistica && (
+          <div>
+            <Button variant="ghost" className="w-full justify-start flex items-center" onClick={toggleDuenosMenu}>
+              <Users className="mr-2 h-4 w-4" /> Dueños
+              {isDuenosMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
+            </Button>
+            {isDuenosMenuOpen && (
+              <div className="pl-6 mt-2 space-y-1">
+                <Link to="/crear-dueño" className="w-full block">
+                  <Button variant="ghost" className="w-full justify-start">Crear Dueño</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
       </nav>
     </aside>
   );

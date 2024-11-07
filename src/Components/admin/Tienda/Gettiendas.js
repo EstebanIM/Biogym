@@ -51,7 +51,7 @@ export default function VerTiendas() {
         {/* Contenido Principal - Lista de Tiendas */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4">
           <div className="max-w-7xl mx-auto p-4 bg-white shadow-md rounded-lg">
-            <h1 className="text-2xl font-bold mb-6">Tiendas y sus Bodegas</h1>
+            <h1 className="text-2xl font-bold mb-6">Tiendas</h1>
 
             {/* Mostrar mensaje de carga o error */}
             {loading && <div>Cargando datos...</div>}
